@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CrypTAS Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0e1a; color: #e0e6ff; font-family: 'Segoe UI', sans-serif; }
+    .topbar { background: #0d1530; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1e2d5a; }
+    .logo { font-size: 22px; font-weight: 700; color: #4f8ef7; letter-spacing: 1px; }
+    .logo span { color: #a78bfa; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .dot-green { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+    .dot-yellow { background: #facc15; }
+    .dot-red { background: #ef4444; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; padding: 28px 32px; }
+    .card { background: #0d1530; border: 1px solid #1e2d5a; border-radius: 12px; padding: 22px; }
+    .card h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #6b7db3; margin-bottom: 12px; }
+    .big-num { font-size: 42px; font-weight: 700; color: #4f8ef7; }
+    .section { padding: 0 32px 28px; }
+    .section h2 { font-size: 16px; color: #a0aec0; margin-bottom: 16px; border-bottom: 1px solid #1e2d5a; padding-bottom: 10px; }
+    .client-row { display: flex; align-items: center; background: #0d1530; border: 1px solid #1e2d5a; border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; gap: 16px; }
+    .client-badge { background: #1e2d5a; border-radius: 6px; padding: 4px 10px; font-size: 13px; font-weight: 600; color: #4f8ef7; }
+    .tag { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .tag-green { background: #14532d; color: #4ade80; }
+    .tag-red { background: #450a0a; color: #f87171; }
+    .tag-gray { background: #1e2d5a; color: #94a3b8; }
+    button { cursor: pointer; border: none; border-radius: 8px; padding: 10px 22px; font-size: 14px; font-weight: 600; transition: 0.2s; }
+    .btn-primary { background: #4f8ef7; color: #fff; }
+    .btn-primary:hover { background: #3b78e7; }
+    .btn-primary:disabled { background: #1e2d5a; color: #6b7db3; cursor: not-allowed; }
+    .log-box { background: #060b18; border: 1px solid #1e2d5a; border-radius: 8px; padding: 16px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; color: #94a3b8; }
+    .log-line { margin-bottom: 4px; }
+    .log-line.anomaly { color: #f87171; }
+    .log-line.ok { color: #4ade80; }
+    .alert-box { background: #450a0a; border: 1px solid #7f1d1d; border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; color: #fca5a5; font-size: 13px; }
+    .round-row { background: #0d1530; border: 1px solid #1e2d5a; border-radius: 8px; padding: 12px 18px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    .flex { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .spinner { border: 3px solid #1e2d5a; border-top: 3px solid #4f8ef7; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const API = "http://localhost:5000/api";
+
+    function useFetch(url, interval = 5000) {
+      const [data, setData] = React.useState(null);
+      const [loading, setLoading] = React.useState(true);
+      const fetchData = () => {
+        fetch(url)
+          .then(r => r.json())
+          .then(d => { setData(d); setLoading(false); })
+          .catch(() => setLoading(false));
+      };
+      React.useEffect(() => {
+        fetchData();
+        const id = setInterval(fetchData, interval);
+        return () => clearInterval(id);
+      }, [url]);
+      return { data, loading, refetch: fetchData };
+    }
+
+    function StatusCards({ status }) {
+      if (!status) return null;
+      return (
+        <div className="grid">
+          <div className="card">
+            <h3>Clients Ready</h3>
+            <div className="big-num">{status.clients_ready}<span style={{fontSize:20,color:'#6b7db3'}}>/{status.total_clients}</span></div>
+          </div>
+          <div className="card">
+            <h3>Global Model</h3>
+            <div style={{marginTop:8}}>
+              <span className={`status-dot ${status.global_model_ready ? 'dot-green' : 'dot-yellow'}`}></span>
+              <span style={{fontSize:16,fontWeight:600}}>{status.global_model_ready ? 'Ready' : 'Not trained yet'}</span>
+              {status.model_info?.updated_at && <div style={{fontSize:11,color:'#6b7db3',marginTop:6}}>Updated: {new Date(status.model_info.updated_at).toLocaleString()}</div>}
+            </div>
+          </div>
+          <div className="card">
+            <h3>Rounds Completed</h3>
+            <div className="big-num">{status.rounds_completed}</div>
+          </div>
+        </div>
+      );
+    }
+
+    function ClientPanel({ clientsReady }) {
+      return (
+        <div className="section">
+          <h2>🔒 Client Nodes</h2>
+          {[1,2,3].map(i => (
+            <div className="client-row" key={i}>
+              <span className="client-badge">Client {i}</span>
+              <span className={`status-dot ${i <= clientsReady ? 'dot-green' : 'dot-yellow'}`}></span>
+              <span style={{flex:1, fontSize:13}}>{i <= clientsReady ? 'Weights uploaded & encrypted (AES-256)' : 'Waiting for training...'}</span>
+              <span className={`tag ${i <= clientsReady ? 'tag-green' : 'tag-gray'}`}>{i <= clientsReady ? 'Ready' : 'Pending'}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function AnomalyPanel({ anomalies }) {
+      if (!anomalies || anomalies.length === 0)
+        return <div className="section"><h2>⚠️ Anomaly Alerts</h2><p style={{color:'#4ade80',fontSize:13}}>✓ No anomalies detected across all rounds.</p></div>;
+      return (
+        <div className="section">
+          <h2>⚠️ Anomaly Alerts</h2>
+          {anomalies.map((a, i) => (
+            <div className="alert-box" key={i}>
+              🚨 Round {a.round} — Flagged clients: <strong>{a.flagged_clients.join(", ")}</strong>
+              <span style={{float:'right',fontSize:11,opacity:0.7}}>{new Date(a.timestamp).toLocaleString()}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function RoundHistory({ rounds }) {
+      return (
+        <div className="section">
+          <h2>📋 Round History</h2>
+          {rounds.length === 0 && <p style={{color:'#6b7db3',fontSize:13}}>No rounds completed yet. Run aggregation to start.</p>}
+          {[...rounds].reverse().map((r, i) => (
+            <div className="round-row" key={i}>
+              <span style={{color:'#4f8ef7',fontWeight:600}}>Round {r.round}</span>
+              <span style={{color:'#94a3b8'}}>{r.result?.clients_received} clients aggregated</span>
+              <span className={`tag ${r.result?.flagged?.length > 0 ? 'tag-red' : 'tag-green'}`}>
+                {r.result?.flagged?.length > 0 ? `${r.result.flagged.length} flagged` : 'Clean'}
+              </span>
+              <span style={{color:'#6b7db3',fontSize:11}}>{new Date(r.timestamp).toLocaleTimeString()}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function LogViewer() {
+      const { data } = useFetch(`${API}/logs`, 3000);
+      return (
+        <div className="section">
+          <h2>📜 Server Logs</h2>
+          <div className="log-box">
+            {data?.logs?.map((line, i) => (
+              <div key={i} className={`log-line ${line.includes('ANOMALY') ? 'anomaly' : line.includes('[✓]') ? 'ok' : ''}`}>{line}</div>
+            )) ?? <div style={{color:'#6b7db3'}}>No logs yet...</div>}
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const { data: status, loading: sLoading, refetch: refetchStatus } = useFetch(`${API}/status`);
+      const { data: roundsData, refetch: refetchRounds } = useFetch(`${API}/rounds`);
+      const { data: anomData, refetch: refetchAnom } = useFetch(`${API}/anomalies`);
+      const [aggregating, setAggregating] = React.useState(false);
+      const [msg, setMsg] = React.useState("");
+
+      const runAggregation = async () => {
+        setAggregating(true);
+        setMsg("");
+        try {
+          const res = await fetch(`${API}/aggregate`, { method: "POST" });
+          const data = await res.json();
+          setMsg(data.success ? "✓ Aggregation complete!" : `Error: ${data.error}`);
+          refetchStatus(); refetchRounds(); refetchAnom();
+        } catch (e) {
+          setMsg("⚠ Could not connect to API. Is api.py running?");
+        }
+        setAggregating(false);
+      };
+
+      return (
+        <div>
+          <div className="topbar">
+            <div className="logo">Cryp<span>TAS</span> <span style={{fontSize:13,color:'#6b7db3',fontWeight:400}}>Federated Threat Analysis System</span></div>
+            <div className="flex">
+              {msg && <span style={{fontSize:13,color: msg.startsWith('✓') ? '#4ade80':'#f87171'}}>{msg}</span>}
+              <button className="btn-primary" onClick={runAggregation} disabled={aggregating}>
+                {aggregating ? <span style={{display:'flex',alignItems:'center',gap:8}}><div className="spinner"></div> Aggregating...</span> : '▶ Run Aggregation'}
+              </button>
+            </div>
+          </div>
+
+          {sLoading ? <div style={{padding:40,textAlign:'center',color:'#6b7db3'}}>Loading...</div> : (
+            <>
+              <StatusCards status={status} />
+              <ClientPanel clientsReady={status?.clients_ready ?? 0} />
+              <AnomalyPanel anomalies={anomData?.anomalies ?? []} />
+              <RoundHistory rounds={roundsData?.rounds ?? []} />
+              <LogViewer />
+            </>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

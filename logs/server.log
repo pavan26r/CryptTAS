@@ -1,0 +1,50 @@
+[2026-03-25 23:16:03] ==================================================
+[2026-03-25 23:16:03] Starting federated aggregation round...
+[2026-03-25 23:16:20] ==================================================
+[2026-03-25 23:16:20] Starting federated aggregation round...
+[2026-03-25 23:16:20] [✓] Decrypted weights from client 1
+[2026-03-25 23:16:20] [✓] Decrypted weights from client 2
+[2026-03-25 23:16:20] [✓] Decrypted weights from client 3
+[2026-03-25 23:16:20] [OK] Client 1: z-score=0.85, norm=13.6432
+[2026-03-25 23:16:20] [OK] Client 2: z-score=0.55, norm=13.6663
+[2026-03-25 23:16:20] [OK] Client 3: z-score=1.40, norm=13.8187
+[2026-03-25 23:16:20] [✓] FedAvg aggregated 3 clients (excluded: [])
+[2026-03-25 23:16:20] [✓] Global model saved to C:\Users\harsh\Desktop\CrypTAS\CrypTAS\clients\..\server\global_model.json
+[2026-03-25 23:16:20] Aggregation round complete.
+[2026-03-25 23:16:20] ==================================================
+[2026-03-25 23:16:20] ==================================================
+[2026-03-25 23:16:20] Starting federated aggregation round...
+[2026-03-25 23:16:20] [✓] Decrypted weights from client 1
+[2026-03-25 23:16:20] [✓] Decrypted weights from client 2
+[2026-03-25 23:16:20] [✓] Decrypted weights from client 3
+[2026-03-25 23:16:20] [OK] Client 1: z-score=0.85, norm=13.6432
+[2026-03-25 23:16:20] [OK] Client 2: z-score=0.55, norm=13.6663
+[2026-03-25 23:16:20] [OK] Client 3: z-score=1.40, norm=13.8187
+[2026-03-25 23:16:20] [✓] FedAvg aggregated 3 clients (excluded: [])
+[2026-03-25 23:16:20] [✓] Global model saved to C:\Users\harsh\Desktop\CrypTAS\CrypTAS\clients\..\server\global_model.json
+[2026-03-25 23:16:20] Aggregation round complete.
+[2026-03-25 23:16:20] ==================================================
+[2026-03-25 23:16:21] ==================================================
+[2026-03-25 23:16:21] Starting federated aggregation round...
+[2026-03-25 23:16:21] [✓] Decrypted weights from client 1
+[2026-03-25 23:16:21] [✓] Decrypted weights from client 2
+[2026-03-25 23:16:21] [✓] Decrypted weights from client 3
+[2026-03-25 23:16:21] [OK] Client 1: z-score=0.85, norm=13.6432
+[2026-03-25 23:16:21] [OK] Client 2: z-score=0.55, norm=13.6663
+[2026-03-25 23:16:21] [OK] Client 3: z-score=1.40, norm=13.8187
+[2026-03-25 23:16:21] [✓] FedAvg aggregated 3 clients (excluded: [])
+[2026-03-25 23:16:21] [✓] Global model saved to C:\Users\harsh\Desktop\CrypTAS\CrypTAS\clients\..\server\global_model.json
+[2026-03-25 23:16:21] Aggregation round complete.
+[2026-03-25 23:16:21] ==================================================
+[2026-03-25 23:19:30] ==================================================
+[2026-03-25 23:19:30] Starting federated aggregation round...
+[2026-03-25 23:19:31] [✓] Decrypted weights from client 1
+[2026-03-25 23:19:31] [✓] Decrypted weights from client 2
+[2026-03-25 23:19:31] [✓] Decrypted weights from client 3
+[2026-03-25 23:19:31] [OK] Client 1: z-score=0.85, norm=13.6432
+[2026-03-25 23:19:31] [OK] Client 2: z-score=0.55, norm=13.6663
+[2026-03-25 23:19:31] [OK] Client 3: z-score=1.40, norm=13.8187
+[2026-03-25 23:19:31] [✓] FedAvg aggregated 3 clients (excluded: [])
+[2026-03-25 23:19:31] [✓] Global model saved to C:\Users\harsh\Desktop\CrypTAS\CrypTAS\server\global_model.json
+[2026-03-25 23:19:31] Aggregation round complete.
+[2026-03-25 23:19:31] ==================================================
