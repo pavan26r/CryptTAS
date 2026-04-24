@@ -102,6 +102,23 @@ def save_global_model(weights: dict):
     log(f"[✓] Global model saved to {GLOBAL_MODEL_PATH}")
 
 
+def load_global_model():
+    if not os.path.exists(GLOBAL_MODEL_PATH):
+        return None
+
+    with open(GLOBAL_MODEL_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    try:
+        return {
+            "coef": np.array(data["coef"], dtype=np.float32),
+            "intercept": np.array(data["intercept"], dtype=np.float32)
+        }
+    except (KeyError, ValueError) as exc:
+        log(f"[!] Failed to load global model: {exc}")
+        return None
+
+
 def aggregate():
     log("=" * 50)
     log("Starting federated aggregation round...")

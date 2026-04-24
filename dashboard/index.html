@@ -1,208 +1,423 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CrypTAS Dashboard</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0a0e1a; color: #e0e6ff; font-family: 'Segoe UI', sans-serif; }
-    .topbar { background: #0d1530; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1e2d5a; }
-    .logo { font-size: 22px; font-weight: 700; color: #4f8ef7; letter-spacing: 1px; }
-    .logo span { color: #a78bfa; }
-    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-    .dot-green { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
-    .dot-yellow { background: #facc15; }
-    .dot-red { background: #ef4444; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; padding: 28px 32px; }
-    .card { background: #0d1530; border: 1px solid #1e2d5a; border-radius: 12px; padding: 22px; }
-    .card h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #6b7db3; margin-bottom: 12px; }
-    .big-num { font-size: 42px; font-weight: 700; color: #4f8ef7; }
-    .section { padding: 0 32px 28px; }
-    .section h2 { font-size: 16px; color: #a0aec0; margin-bottom: 16px; border-bottom: 1px solid #1e2d5a; padding-bottom: 10px; }
-    .client-row { display: flex; align-items: center; background: #0d1530; border: 1px solid #1e2d5a; border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; gap: 16px; }
-    .client-badge { background: #1e2d5a; border-radius: 6px; padding: 4px 10px; font-size: 13px; font-weight: 600; color: #4f8ef7; }
-    .tag { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .tag-green { background: #14532d; color: #4ade80; }
-    .tag-red { background: #450a0a; color: #f87171; }
-    .tag-gray { background: #1e2d5a; color: #94a3b8; }
-    button { cursor: pointer; border: none; border-radius: 8px; padding: 10px 22px; font-size: 14px; font-weight: 600; transition: 0.2s; }
-    .btn-primary { background: #4f8ef7; color: #fff; }
-    .btn-primary:hover { background: #3b78e7; }
-    .btn-primary:disabled { background: #1e2d5a; color: #6b7db3; cursor: not-allowed; }
-    .log-box { background: #060b18; border: 1px solid #1e2d5a; border-radius: 8px; padding: 16px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; color: #94a3b8; }
-    .log-line { margin-bottom: 4px; }
-    .log-line.anomaly { color: #f87171; }
-    .log-line.ok { color: #4ade80; }
-    .alert-box { background: #450a0a; border: 1px solid #7f1d1d; border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; color: #fca5a5; font-size: 13px; }
-    .round-row { background: #0d1530; border: 1px solid #1e2d5a; border-radius: 8px; padding: 12px 18px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
-    .flex { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .spinner { border: 3px solid #1e2d5a; border-top: 3px solid #4f8ef7; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrypTAS Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .big-num {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #007acc, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+        }
+        .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 10px; }
+        .dot-green { background: #28a745; box-shadow: 0 0 10px rgba(40, 167, 69, 0.5); }
+        .dot-yellow { background: #ffc107; box-shadow: 0 0 10px rgba(255, 193, 7, 0.5); }
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 3px solid #007acc;
+            padding-bottom: 10px;
+        }
+        .round-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; align-items: center; }
+        .round-row:hover { background: #f8f9fa; }
+        .attack-group {
+            margin: 15px 0;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .toggle-btn {
+            background: linear-gradient(45deg, #007acc, #00d4ff);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn:hover { background: linear-gradient(45deg, #005a9e, #0099cc); transform: scale(1.02); }
+        .ip-list { margin-top: 0; max-height: 300px; overflow-y: auto; background: #f8f9fa; }
+        .ip-item {
+            background: white;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #007acc;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .ip-item:hover { background: #e3f2fd; }
+        .aggregate-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .aggregate-btn:hover:not(:disabled) {
+            background: linear-gradient(45deg, #218838, #1aa085);
+            transform: scale(1.05);
+        }
+        .aggregate-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .overview-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .overview-card h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .overview-card p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .rounds-table {
+            margin-top: 20px;
+        }
+        .rounds-table h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .rounds-table table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .rounds-table th, .rounds-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .rounds-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        .rounds-table tr:hover {
+            background: #f8f9fa;
+        }
+    </style>
 </head>
 <body>
-  <div id="root"></div>
+    <h1> CrypTAS Federated Learning Dashboard</h1>
+    <div id="root"></div>
 
-  <script type="text/babel">
-    const API = "http://localhost:5000/api";
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.5/babel.min.js"></script>
 
-    function useFetch(url, interval = 5000) {
-      const [data, setData] = React.useState(null);
-      const [loading, setLoading] = React.useState(true);
-      const fetchData = () => {
-        fetch(url)
-          .then(r => r.json())
-          .then(d => { setData(d); setLoading(false); })
-          .catch(() => setLoading(false));
-      };
-      React.useEffect(() => {
-        fetchData();
-        const id = setInterval(fetchData, interval);
-        return () => clearInterval(id);
-      }, [url]);
-      return { data, loading, refetch: fetchData };
-    }
+<script type="text/babel">
+const API = "http://localhost:5000/api";
 
-    function StatusCards({ status }) {
-      if (!status) return null;
-      return (
-        <div className="grid">
-          <div className="card">
-            <h3>Clients Ready</h3>
-            <div className="big-num">{status.clients_ready}<span style={{fontSize:20,color:'#6b7db3'}}>/{status.total_clients}</span></div>
-          </div>
-          <div className="card">
-            <h3>Global Model</h3>
-            <div style={{marginTop:8}}>
-              <span className={`status-dot ${status.global_model_ready ? 'dot-green' : 'dot-yellow'}`}></span>
-              <span style={{fontSize:16,fontWeight:600}}>{status.global_model_ready ? 'Ready' : 'Not trained yet'}</span>
-              {status.model_info?.updated_at && <div style={{fontSize:11,color:'#6b7db3',marginTop:6}}>Updated: {new Date(status.model_info.updated_at).toLocaleString()}</div>}
-            </div>
-          </div>
-          <div className="card">
-            <h3>Rounds Completed</h3>
-            <div className="big-num">{status.rounds_completed}</div>
-          </div>
+/* FETCH HOOK */
+function useFetch(url, interval = 5000) {
+  const [data, setData] = React.useState(null);
+
+  const fetchData = () => {
+    fetch(url)
+      .then(r => r.json())
+      .then(setData);
+  };
+
+  React.useEffect(() => {
+    fetchData();
+    const id = setInterval(fetchData, interval);
+    return () => clearInterval(id);
+  }, [url]);
+
+  return { data, refetch: fetchData };
+}
+
+
+/* STATUS CARDS */
+function StatusCards({ status }) {
+  if (!status) return null;
+
+  return (
+    <div className="grid">
+      <div className="card">
+        <h3>Clients</h3>
+        <div className="big-num">{status.clients_ready}/{status.total_clients}</div>
+      </div>
+
+      <div className="card">
+        <h3>Model</h3>
+        <span className={`status-dot ${status.global_model_ready ? 'dot-green':'dot-yellow'}`}></span>
+        {status.global_model_ready ? "Ready" : "Not trained"}
+      </div>
+
+      <div className="card">
+        <h3>Rounds</h3>
+        <div className="big-num">{status.rounds_completed}</div>
+      </div>
+    </div>
+  );
+}
+
+
+/* ATTACK DISTRIBUTION */
+function AttackDistribution() {
+  const { data } = useFetch(`${API}/stats`);
+  if (!data) return null;
+
+  return (
+    <div className="section">
+      <h2>📊 Attack Distribution</h2>
+
+      {Object.entries(data.attack_counts).map(([type, count]) => (
+        <div className="round-row" key={type}>
+          <span>{type}</span>
+          <span>{count}</span>
         </div>
-      );
-    }
+      ))}
+    </div>
+  );
+}
 
-    function ClientPanel({ clientsReady }) {
-      return (
-        <div className="section">
-          <h2>🔒 Client Nodes</h2>
-          {[1,2,3].map(i => (
-            <div className="client-row" key={i}>
-              <span className="client-badge">Client {i}</span>
-              <span className={`status-dot ${i <= clientsReady ? 'dot-green' : 'dot-yellow'}`}></span>
-              <span style={{flex:1, fontSize:13}}>{i <= clientsReady ? 'Weights uploaded & encrypted (AES-256)' : 'Waiting for training...'}</span>
-              <span className={`tag ${i <= clientsReady ? 'tag-green' : 'tag-gray'}`}>{i <= clientsReady ? 'Ready' : 'Pending'}</span>
-            </div>
-          ))}
-        </div>
-      );
-    }
 
-    function AnomalyPanel({ anomalies }) {
-      if (!anomalies || anomalies.length === 0)
-        return <div className="section"><h2>⚠️ Anomaly Alerts</h2><p style={{color:'#4ade80',fontSize:13}}>✓ No anomalies detected across all rounds.</p></div>;
-      return (
-        <div className="section">
-          <h2>⚠️ Anomaly Alerts</h2>
-          {anomalies.map((a, i) => (
-            <div className="alert-box" key={i}>
-              🚨 Round {a.round} — Flagged clients: <strong>{a.flagged_clients.join(", ")}</strong>
-              <span style={{float:'right',fontSize:11,opacity:0.7}}>{new Date(a.timestamp).toLocaleString()}</span>
-            </div>
-          ))}
-        </div>
-      );
-    }
+/* TRAINING OVERVIEW */
+function TrainingOverview({ status, rounds }) {
+  const [aggregating, setAggregating] = React.useState(false);
 
-    function RoundHistory({ rounds }) {
-      return (
-        <div className="section">
-          <h2>📋 Round History</h2>
-          {rounds.length === 0 && <p style={{color:'#6b7db3',fontSize:13}}>No rounds completed yet. Run aggregation to start.</p>}
-          {[...rounds].reverse().map((r, i) => (
-            <div className="round-row" key={i}>
-              <span style={{color:'#4f8ef7',fontWeight:600}}>Round {r.round}</span>
-              <span style={{color:'#94a3b8'}}>{r.result?.clients_received} clients aggregated</span>
-              <span className={`tag ${r.result?.flagged?.length > 0 ? 'tag-red' : 'tag-green'}`}>
-                {r.result?.flagged?.length > 0 ? `${r.result.flagged.length} flagged` : 'Clean'}
-              </span>
-              <span style={{color:'#6b7db3',fontSize:11}}>{new Date(r.timestamp).toLocaleTimeString()}</span>
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    function LogViewer() {
-      const { data } = useFetch(`${API}/logs`, 3000);
-      return (
-        <div className="section">
-          <h2>📜 Server Logs</h2>
-          <div className="log-box">
-            {data?.logs?.map((line, i) => (
-              <div key={i} className={`log-line ${line.includes('ANOMALY') ? 'anomaly' : line.includes('[✓]') ? 'ok' : ''}`}>{line}</div>
-            )) ?? <div style={{color:'#6b7db3'}}>No logs yet...</div>}
-          </div>
-        </div>
-      );
-    }
-
-    function App() {
-      const { data: status, loading: sLoading, refetch: refetchStatus } = useFetch(`${API}/status`);
-      const { data: roundsData, refetch: refetchRounds } = useFetch(`${API}/rounds`);
-      const { data: anomData, refetch: refetchAnom } = useFetch(`${API}/anomalies`);
-      const [aggregating, setAggregating] = React.useState(false);
-      const [msg, setMsg] = React.useState("");
-
-      const runAggregation = async () => {
-        setAggregating(true);
-        setMsg("");
-        try {
-          const res = await fetch(`${API}/aggregate`, { method: "POST" });
-          const data = await res.json();
-          setMsg(data.success ? "✓ Aggregation complete!" : `Error: ${data.error}`);
-          refetchStatus(); refetchRounds(); refetchAnom();
-        } catch (e) {
-          setMsg("⚠ Could not connect to API. Is api.py running?");
-        }
+  const triggerAggregate = () => {
+    setAggregating(true);
+    fetch(`${API}/aggregate`, { method: 'POST' })
+      .then(r => r.json())
+      .then(() => {
         setAggregating(false);
-      };
+        // Refetch rounds after aggregation
+        window.location.reload();
+      })
+      .catch(() => setAggregating(false));
+  };
 
-      return (
-        <div>
-          <div className="topbar">
-            <div className="logo">Cryp<span>TAS</span> <span style={{fontSize:13,color:'#6b7db3',fontWeight:400}}>Federated Threat Analysis System</span></div>
-            <div className="flex">
-              {msg && <span style={{fontSize:13,color: msg.startsWith('✓') ? '#4ade80':'#f87171'}}>{msg}</span>}
-              <button className="btn-primary" onClick={runAggregation} disabled={aggregating}>
-                {aggregating ? <span style={{display:'flex',alignItems:'center',gap:8}}><div className="spinner"></div> Aggregating...</span> : '▶ Run Aggregation'}
-              </button>
-            </div>
+  if (!status || !rounds) return null;
+
+  return (
+    <div className="section">
+      <h2>🎯 Training Overview</h2>
+      <button 
+        onClick={triggerAggregate} 
+        disabled={aggregating}
+        className="aggregate-btn"
+      >
+        {aggregating ? '🔄 Aggregating...' : '🚀 Run New Round'}
+      </button>
+      
+      <div className="overview-grid">
+        <div className="overview-card">
+          <h3>Active Clients</h3>
+          <div className="big-num">{status.clients_ready}/3</div>
+          <p>Ready for training</p>
+        </div>
+        <div className="overview-card">
+          <h3>Global Model</h3>
+          <span className={`status-dot ${status.global_model_ready ? 'dot-green':'dot-yellow'}`}></span>
+          <p>{status.global_model_ready ? "Trained" : "Not trained"}</p>
+        </div>
+        <div className="overview-card">
+          <h3>Completed Rounds</h3>
+          <div className="big-num">{status.rounds_completed}</div>
+          <p>Federated iterations</p>
+        </div>
+      </div>
+      
+      {rounds.rounds.length > 0 && (
+        <div className="rounds-table">
+          <h3>Recent Rounds</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Round</th>
+                <th>Timestamp</th>
+                <th>Clients</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rounds.rounds.slice(-5).map((round, i) => (
+                <tr key={i}>
+                  <td>{round.round}</td>
+                  <td>{new Date(round.timestamp).toLocaleString()}</td>
+                  <td>{round.result?.clients_received || 'N/A'}</td>
+                  <td>{round.result?.success ? '✅ Success' : '❌ Failed'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ROUNDS SECTION */
+function RoundsSection() {
+  const { data: rounds } = useFetch(`${API}/rounds`);
+  const [aggregating, setAggregating] = React.useState(false);
+
+  const triggerAggregate = () => {
+    setAggregating(true);
+    fetch(`${API}/aggregate`, { method: 'POST' })
+      .then(r => r.json())
+      .then(() => {
+        setAggregating(false);
+        // Refetch rounds after aggregation
+        window.location.reload();
+      })
+      .catch(() => setAggregating(false));
+  };
+
+  if (!rounds) return null;
+
+  return (
+    <div className="section">
+      <h2>🔄 Training Rounds</h2>
+      <button 
+        onClick={triggerAggregate} 
+        disabled={aggregating}
+        className="aggregate-btn"
+      >
+        {aggregating ? '🔄 Aggregating...' : ' Run New Round'}
+      </button>
+      
+      {rounds.rounds.length === 0 ? (
+        <p>No rounds completed yet. Click above to start training!</p>
+      ) : (
+        rounds.rounds.map((round, i) => (
+          <div className="round-row" key={i}>
+            <span>Round {round.round}</span>
+            <span>{new Date(round.timestamp).toLocaleString()}</span>
+            <span>✅ Completed</span>
           </div>
+        ))
+      )}
+    </div>
+  );
+}
 
-          {sLoading ? <div style={{padding:40,textAlign:'center',color:'#6b7db3'}}>Loading...</div> : (
-            <>
-              <StatusCards status={status} />
-              <ClientPanel clientsReady={status?.clients_ready ?? 0} />
-              <AnomalyPanel anomalies={anomData?.anomalies ?? []} />
-              <RoundHistory rounds={roundsData?.rounds ?? []} />
-              <LogViewer />
-            </>
+
+/* ANOMALY PANEL */
+function AnomalyPanel({ anomalies }) {
+  const [expanded, setExpanded] = React.useState({});
+
+  if (!anomalies || anomalies.length === 0)
+    return <div className="section"><h2>⚠️ No anomalies</h2></div>;
+
+  const grouped = anomalies.reduce((acc, a) => {
+    if (!acc[a.type]) acc[a.type] = [];
+    acc[a.type].push(a);
+    return acc;
+  }, {});
+
+  const toggle = (type) => {
+    setExpanded(prev => ({ ...prev, [type]: !prev[type] }));
+  };
+
+  return (
+    <div className="section">
+      <h2>⚠️ Risky IPs by Attack Type</h2>
+
+      {Object.entries(grouped).map(([type, attacks]) => (
+        <div key={type} className="attack-group">
+          <button onClick={() => toggle(type)} className="toggle-btn">
+            {type} ({attacks.length} IPs) {expanded[type] ? '▼' : '▶'}
+          </button>
+          {expanded[type] && (
+            <div className="ip-list">
+              {attacks.map((a, i) => (
+                <div key={i} className="ip-item">
+                  {a.ip} | RPM: {a.rpm} | Error: {a.error}
+                </div>
+              ))}
+            </div>
           )}
         </div>
-      );
-    }
+      ))}
+    </div>
+  );
+}
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-  </script>
+/* APP */
+function App() {
+  const { data: status } = useFetch(`${API}/status`);
+  const { data: rounds } = useFetch(`${API}/rounds`);
+  const { data: anom } = useFetch(`${API}/anomalies`);
+
+  return (
+    <>
+      <TrainingOverview status={status} rounds={rounds} />
+      <AttackDistribution />
+      <AnomalyPanel anomalies={anom?.anomalies} />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+
 </body>
 </html>

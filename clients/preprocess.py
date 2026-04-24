@@ -23,27 +23,48 @@ COLUMNS = [
 ]
 
 CATEGORICAL = ["protocol_type", "service", "flag"]
-RAW_PATH = "../data/raw/KDDTest+.txt"
-PROCESSED_PATH = "../data/processed"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+RAW_KDD_PATH = os.path.join(BASE_DIR, "..", "data", "raw", "KDDTest+.txt")
+RAW_SYNTHETIC_PATH = os.path.join(BASE_DIR, "..", "data", "raw", "traffic_dataset.csv")
+PROCESSED_PATH = os.path.join(BASE_DIR, "..", "data", "processed")
 NUM_CLIENTS = 3
 
 def preprocess():
-    print("[*] Loading NSL-KDD dataset...")
-    df = pd.read_csv(RAW_PATH, header=None, names=COLUMNS)
-    df.drop(columns=["difficulty"], inplace=True)
+    if os.path.exists(RAW_SYNTHETIC_PATH):
+        print("[*] Loading synthetic traffic dataset...")
+        df = pd.read_csv(RAW_SYNTHETIC_PATH)
 
-    print("[*] Encoding categorical columns...")
-    for col in CATEGORICAL:
-        le = LabelEncoder()
-        df[col] = le.fit_transform(df[col])
+        print("[*] Dropping non-feature columns...")
+        drop_cols = ["ip_address", "minute", "attack_type"]
+        df = df.drop(columns=[c for c in drop_cols if c in df.columns])
 
-    print("[*] Binarizing labels (0=normal, 1=attack)...")
-    df["label"] = df["label"].apply(lambda x: 0 if x == "normal" else 1)
+        print("[*] Scaling synthetic features with MinMaxScaler...")
+        features = [c for c in df.columns if c != "label"]
+        scaler = MinMaxScaler()
+        df[features] = scaler.fit_transform(df[features])
 
-    print("[*] Scaling features with MinMaxScaler...")
-    features = [c for c in df.columns if c != "label"]
-    scaler = MinMaxScaler()
-    df[features] = scaler.fit_transform(df[features])
+    elif os.path.exists(RAW_KDD_PATH):
+        print("[*] Loading NSL-KDD dataset...")
+        df = pd.read_csv(RAW_KDD_PATH, header=None, names=COLUMNS)
+        df.drop(columns=["difficulty"], inplace=True)
+
+        print("[*] Encoding categorical columns...")
+        for col in CATEGORICAL:
+            le = LabelEncoder()
+            df[col] = le.fit_transform(df[col])
+
+        print("[*] Binarizing labels (0=normal, 1=attack)...")
+        df["label"] = df["label"].apply(lambda x: 0 if x == "normal" else 1)
+
+        features = [c for c in df.columns if c != "label"]
+        print("[*] Scaling NSL-KDD features with MinMaxScaler...")
+        scaler = MinMaxScaler()
+        df[features] = scaler.fit_transform(df[features])
+
+    else:
+        raise FileNotFoundError(
+            "No raw dataset found. Place KDDTest+.txt in data/raw or generate traffic_dataset.csv with data/dataset_generator.py"
+        )
 
     os.makedirs(PROCESSED_PATH, exist_ok=True)
 

@@ -23,11 +23,12 @@ def generate_key(passphrase: str = None) -> bytes:
 def encrypt_weights(weights: dict, key: bytes) -> dict:
     """
     Encrypt model weights dictionary using AES-256-CBC.
-    weights: dict of {layer_name: numpy_array}
+    weights: dict of {layer_name: array-like}
     Returns: dict of {layer_name: {'ciphertext': b64, 'iv': b64}}
     """
     encrypted = {}
     for layer_name, w_array in weights.items():
+        w_array = np.asarray(w_array)
         # Serialize numpy array to bytes
         w_bytes = w_array.tobytes()
         shape = list(w_array.shape)

@@ -14,7 +14,7 @@ import json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from clients.client_train import train_client
-from server.federated_server import aggregate
+from server.federated_server import aggregate, load_global_model
 
 NUM_ROUNDS = 3
 NUM_CLIENTS = 3
@@ -33,9 +33,13 @@ def run_pipeline():
         print(f"{'='*60}")
 
         # Step 1: Train all clients
+        global_weights = load_global_model() if round_num > 1 else None
+        if global_weights is not None:
+            print(f"[Pipeline] Warm-starting client training from saved global model for round {round_num}.")
+
         client_accs = {}
         for cid in range(1, NUM_CLIENTS + 1):
-            acc = train_client(cid)
+            acc = train_client(cid, global_weights)
             client_accs[cid] = acc
 
         # Step 2: Server aggregation + anomaly detection
